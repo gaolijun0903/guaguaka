@@ -75,6 +75,12 @@ LuckyCard.case(settings,callback);
 		<td>触发回调函数时刮开面积占总面积的比例，超过这个比例回调就触发。建议取值在0到1之间。</td>
 	</tr>
 	<tr>
+		<td>radius</td>
+		<td>number</td>
+		<td>10</td>
+		<td>触点半径大小。</td>
+	</tr>
+	<tr>
 		<td>callback</td>
 		<td>function</td>
 		<td>null</td>
