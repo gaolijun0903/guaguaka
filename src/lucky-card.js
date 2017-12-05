@@ -99,7 +99,7 @@
         var mouseY = evt.pageY - coverPos.top - pageScrollTop;
 
         this.ctx.beginPath();
-        this.ctx.fillStyle = '#FFFFFF';
+        this.ctx.fillStyle = '#ffffff';
         this.ctx.globalCompositeOperation = "destination-out";
         this.ctx.arc(mouseX, mouseY, this.opt.radius, 0, 2 * Math.PI);
         this.ctx.fill();
