@@ -37,7 +37,7 @@
         this.startEventHandler = null;
         this.moveEventHandler = null;
         this.endEventHandler = null;
-
+		this.needDraw=false;
         this.opt = {
             coverColor: '#C5C5C5',
             coverImg: '',
@@ -74,6 +74,18 @@
       var elem = document.createElement('canvas');
       return !!(elem.getContext && elem.getContext('2d'));
     }
+    function _getMousePos(event,luckycard){
+    	var evt = luckycard.supportTouch?event.touches[0]:event;
+        var coverPos = luckycard.cover.getBoundingClientRect();
+        var pageScrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+        var pageScrollLeft = document.documentElement.scrollLeft || document.body.scrollLeft;
+        var mouseX = evt.pageX - coverPos.left - pageScrollLeft;
+        var mouseY = evt.pageY - coverPos.top - pageScrollTop;
+        return {
+        	x: mouseX,
+        	y: mouseY
+        }
+    }
 
     /**
      * touchstart/mousedown event handler
@@ -84,6 +96,15 @@
         this.cover.addEventListener(this.events[1],this.moveEventHandler,false);
         this.endEventHandler = _endEventHandler.bind(this);
         document.addEventListener(this.events[2],this.endEventHandler,false);
+        
+        this.needDraw=true;
+        var pos = _getMousePos(event,this);
+        this.ctx.beginPath();
+        this.ctx.moveTo(pos.x,pos.y);
+        this.ctx.lineCap="round";
+        this.ctx.lineJoin="round";
+        this.ctx.lineWidth=this.opt.radius;
+        this.ctx.globalCompositeOperation = "destination-out";
     };
 
     /**
@@ -91,18 +112,11 @@
      */
     function _moveEventHandler(event) {
         event.preventDefault();
-        var evt = this.supportTouch?event.touches[0]:event;
-        var coverPos = this.cover.getBoundingClientRect();
-        var pageScrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-        var pageScrollLeft = document.documentElement.scrollLeft || document.body.scrollLeft;
-        var mouseX = evt.pageX - coverPos.left - pageScrollLeft;
-        var mouseY = evt.pageY - coverPos.top - pageScrollTop;
-
-        this.ctx.beginPath();
-        this.ctx.fillStyle = '#ffffff';
-        this.ctx.globalCompositeOperation = "destination-out";
-        this.ctx.arc(mouseX, mouseY, this.opt.radius, 0, 2 * Math.PI);
-        this.ctx.fill();
+        var pos = _getMousePos(event,this);
+        if(this.needDraw){
+            this.ctx.lineTo(pos.x,pos.y);
+            this.ctx.stroke();
+        }
     };
 
     /**
@@ -110,6 +124,7 @@
      */
     function _endEventHandler(event) {
         event.preventDefault();
+        this.needDraw=false;
         if (this.opt.callback && typeof this.opt.callback === 'function') _calcArea.call(this,this.ctx, this.opt.callback, this.opt.ratio);
         this.cover.removeEventListener(this.events[1],this.moveEventHandler,false);
         document.removeEventListener(this.events[2],this.endEventHandler,false);
